@@ -1,0 +1,26 @@
+services:
+  shipments:
+    build:
+      context: .
+      target: dev
+
+    container_name: shipments
+    init: true
+    ports:
+      - "5050:3000"
+
+    volumes:
+      - .:/app
+      - api_node_modules:/app/node_modules
+    env_file:
+      - .env
+    command: pnpm start:dev
+    networks:
+      - shipments_network
+
+volumes:
+  api_node_modules:
+
+networks:
+  shipments_network:
+    external: true
