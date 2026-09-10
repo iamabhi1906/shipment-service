@@ -1,14 +1,38 @@
 services:
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: shipment-service
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - shipment-service_data:/var/lib/postgresql/data
+      - ./init-schemas.sql:/docker-entrypoint-initdb.d/init-schemas.sql:ro
+    networks:
+      - shipments_network
+
+  cloudbeaver:
+    image: dbeaver/cloudbeaver:latest
+    container_name: shipment-service-cloudbeaver
+    restart: unless-stopped
+    ports:
+      - "8979:8978"
+    volumes:
+      - cloudbeaver_workspace:/opt/cloudbeaver/workspace
+    networks:
+      - shipments_network
+    depends_on:
+      - postgres
+
   shipments:
     build:
       context: .
       target: dev
-
     container_name: shipments
     init: true
     ports:
       - "5050:3000"
-
     volumes:
       - .:/app
       - api_node_modules:/app/node_modules
@@ -20,6 +44,8 @@ services:
 
 volumes:
   api_node_modules:
+  shipment-service_data:
+  cloudbeaver_workspace:
 
 networks:
   shipments_network:

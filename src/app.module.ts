@@ -1,10 +1,20 @@
-import { Module } from '@nestjs/common';
-import { AppController } from './app.controller.js';
-import { AppService } from './app.service.js';
+import { Module } from "@nestjs/common";
+import { ConfigModule } from "@nestjs/config";
+import { TypeOrmModule } from "@nestjs/typeorm";
+import { AppController } from "./app.controller.js";
+import { AppService } from "./app.service.js";
+import { ShipmentOrmConfig } from "./shipment/infrastructure/database/config/orm.config.js";
+import { ShipmentModule } from "./shipment/shipment.module.js";
 
 @Module({
-  imports: [],
-  controllers: [AppController],
-  providers: [AppService],
+	imports: [
+		ConfigModule.forRoot({
+			isGlobal: true,
+		}),
+		TypeOrmModule.forRootAsync(ShipmentOrmConfig),
+		ShipmentModule,
+	],
+	controllers: [AppController],
+	providers: [AppService],
 })
 export class AppModule {}
