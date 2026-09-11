@@ -1,8 +1,8 @@
 import { Injectable } from "@nestjs/common";
-import { ShipmentRepository } from "../../../domain/repositories/shipment.repository.js";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import Shipment from "../../../domain/shipment/shipment.entity.js";
+import { ShipmentRepository } from "../../../domain/shipment/repositories/shipment.repository.js";
 
 @Injectable()
 export class ShipmentTypeOrmRepository implements ShipmentRepository {

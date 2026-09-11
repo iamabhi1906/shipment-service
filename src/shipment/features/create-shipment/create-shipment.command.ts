@@ -1,7 +1,7 @@
-import { CreateShipmentStop } from "./interface/create-shipment-stop.interface.js";
+import { CreateShipmentStopValidator } from "./create-shipment.validator.js";
 
 class CreateShipmentCommand {
-	constructor(public readonly stops: CreateShipmentStop[]) {}
+	constructor(public readonly stops: CreateShipmentStopValidator[]) {}
 }
 
 export default CreateShipmentCommand;

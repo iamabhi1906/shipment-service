@@ -1,4 +1,5 @@
-import Shipment from "../shipment/shipment.entity.js";
+import Shipment from "../shipment.entity.js";
+
 
 export const SHIPMENT_REPOSITORY_TOKEN = "SHIPMENT_REPOSITORY_TOKEN";
 

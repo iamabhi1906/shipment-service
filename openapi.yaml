@@ -1,0 +1,206 @@
+openapi: 3.0.3
+
+info:
+  title: Shipment Management API
+  description: HTTP API for managing shipments and their stops.
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:5050
+    description: Shipment service
+
+tags:
+  - name: Shipments
+    description: Shipment management operations
+
+paths:
+  /shipments:
+    post:
+      tags:
+        - Shipments
+      summary: Create a shipment
+      operationId: createShipment
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateShipmentRequest"
+            example:
+              stops:
+                - id: "550e8400-e29b-41d4-a716-446655440000"
+                  sequence: 1
+                  type: "PICKUP"
+                - id: "550e8400-e29b-41d4-a716-446655440001"
+                  sequence: 2
+                  type: "DELIVERY"
+
+      responses:
+        "201":
+          description: Shipment created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Shipment"
+
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+
+        "409":
+          description: Shipment violates a domain rule
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+
+components:
+  schemas:
+    CreateShipmentRequest:
+      type: object
+      required:
+        - name
+        - description
+        - stops
+      properties:
+        name:
+          type: string
+          minLength: 1
+          example: "Shipment #1001"
+
+        description:
+          type: string
+          minLength: 1
+          example: "Shipment from Delhi to Chandigarh"
+
+        stops:
+          type: array
+          minItems: 1
+          items:
+            $ref: "#/components/schemas/CreateShipmentStop"
+
+    CreateShipmentStop:
+      type: object
+      required:
+        - id
+        - sequence
+        - type
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+
+        sequence:
+          type: integer
+          minimum: 1
+          example: 1
+
+        type:
+          type: string
+          enum:
+            - PICKUP
+            - DELIVERY
+          example: PICKUP
+
+    Shipment:
+      type: object
+      required:
+        - id
+        - name
+        - description
+        - status
+        - stops
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440010"
+
+        name:
+          type: string
+          example: "Shipment #1001"
+
+        description:
+          type: string
+          example: "Shipment from Delhi to Chandigarh"
+
+        status:
+          type: string
+          enum:
+            - IN_TRANSIT
+            - COMPLETED
+          example: IN_TRANSIT
+
+        stops:
+          type: array
+          items:
+            $ref: "#/components/schemas/Stop"
+
+        createdAt:
+          type: string
+          format: date-time
+
+        updatedAt:
+          type: string
+          format: date-time
+
+    Stop:
+      type: object
+      required:
+        - id
+        - sequence
+        - type
+        - status
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+
+        sequence:
+          type: integer
+          example: 1
+
+        type:
+          type: string
+          enum:
+            - PICKUP
+            - DELIVERY
+          example: PICKUP
+
+        status:
+          type: string
+          enum:
+            - IN_TRANSIT
+            - ARRIVED
+            - DEPARTED
+          example: IN_TRANSIT
+
+    ProblemDetails:
+      type: object
+      properties:
+        type:
+          type: string
+          format: uri
+          example: "https://api.orgatick.site/problems/validation-error"
+
+        title:
+          type: string
+          example: "Validation Error"
+
+        status:
+          type: integer
+          example: 400
+
+        detail:
+          type: string
+          example: "The request contains invalid data."
+
+        instance:
+          type: string
+          example: "/shipments"

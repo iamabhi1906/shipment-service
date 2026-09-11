@@ -1,9 +1,12 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { Inject } from "@nestjs/common";
 import CreateShipmentCommand from "./create-shipment.command.js";
-import { SHIPMENT_REPOSITORY_TOKEN, type ShipmentRepository } from "../../domain/repositories/shipment.repository.js";
-import Shipment from "../../domain/shipment/shipment.entity.js";
+import {
+	SHIPMENT_REPOSITORY_TOKEN,
+	type ShipmentRepository,
+} from "../../domain/shipment/repositories/shipment.repository.js";
 import Stop from "../../domain/shipment/stop.entity.js";
+import Shipment from "../../domain/shipment/shipment.entity.js";
 
 @CommandHandler(CreateShipmentCommand)
 class CreateShipmentHandler implements ICommandHandler<CreateShipmentCommand> {

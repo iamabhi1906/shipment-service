@@ -1,10 +1,10 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn, type Relation } from "typeorm";
-import { ShipmentStatus } from "../../enums/shipment.enums.js";
 import Stop from "./stop.entity.js";
-import { StopStatus } from "../../enums/stops.enums.js";
-import { DomainEvent } from "../events/domain-event.js";
-import ShipmentCreatedEvent from "../events/shipment-created.event.js";
 import { uuid } from "uuidv4";
+import { DomainEvent } from "./events/domain-event.js";
+import { ShipmentStatus } from "./enums/shipment.enums.js";
+import ShipmentCreatedEvent from "./events/shipment-created.event.js";
+import { StopStatus } from "./enums/stops.enums.js";
 
 @Entity({ schema: "shipment", name: "shipments" })
 class Shipment {

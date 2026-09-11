@@ -6,6 +6,7 @@ export class CreateShipmentTable1789036651260 implements MigrationInterface {
 		await queryRunner.createTable(
 			new Table({
 				name: "shipments",
+				schema: "shipment",
 				columns: [
 					{
 						name: "id",
@@ -17,8 +18,8 @@ export class CreateShipmentTable1789036651260 implements MigrationInterface {
 					{
 						name: "status",
 						type: "enum",
-						enum: ["IN_TRANSIT", "COMPLETED"],
-						default: "'IN_TRANSIT'",
+						enum: ["in-transit", "completed"],
+						default: "'in-transit'",
 					},
 					{
 						name: "created_at",

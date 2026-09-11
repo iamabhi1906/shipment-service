@@ -5,13 +5,19 @@ export class CreateStopsTable1789036692109 implements MigrationInterface {
 	async up(queryRunner: QueryRunner): Promise<void> {
 		await queryRunner.createTable(
 			new Table({
-				name: "stops",
+        name: "stops",
+				schema: "shipment",
 				columns: [
 					{ name: "id", type: "uuid", isPrimary: true, generationStrategy: "uuid", default: "uuid_generate_v4()" },
 					{ name: "shipment_id", type: "uuid", isNullable: false },
 					{ name: "sequence", type: "integer", isNullable: false },
-					{ name: "type", type: "enum", enum: ["PICKUP", "DELIVERY"], isNullable: false },
-					{ name: "status", type: "enum", enum: ["IN_TRANSIT", "ARRIVED", "DEPARTED"], default: "'IN_TRANSIT'" },
+					{ name: "type", type: "enum", enum: ["pickup", "delivery"], isNullable: false },
+					{
+						name: "status",
+						type: "enum",
+						enum: ["in-transit", "completed", "cancelled", "arrived", "departed"],
+						default: "'in-transit'",
+					},
 					{ name: "created_at", type: "timestamp", default: "now()" },
 					{ name: "updated_at", type: "timestamp", default: "now()" },
 				],

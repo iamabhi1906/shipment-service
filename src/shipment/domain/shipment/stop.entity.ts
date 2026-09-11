@@ -1,6 +1,6 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn, type Relation } from "typeorm";
-import { StopStatus, StopType } from "../../enums/stops.enums.js";
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, type Relation } from "typeorm";
 import Shipment from "./shipment.entity.js";
+import { StopStatus, StopType } from "./enums/stops.enums.js";
 
 @Entity({ schema: "shipment", name: "stops" })
 class Stop {
@@ -20,6 +20,7 @@ class Stop {
 		() => Shipment,
 		(shipment) => shipment.stops,
 	)
+	@JoinColumn({ name: "shipment_id" })
 	shipment: Relation<Shipment>;
 
 	constructor(id: string, sequence: number, type: StopType) {

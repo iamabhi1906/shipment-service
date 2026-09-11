@@ -1,8 +1,8 @@
 import { IsArray, IsEnum, IsPositive, IsUUID, ValidateNested } from "class-validator";
 import { Type } from "class-transformer";
-import { StopType } from "../../enums/stops.enums.js";
+import { StopType } from "../../domain/shipment/enums/stops.enums.js";
 
-class CreateShipmentStopValidator {
+export class CreateShipmentStopValidator {
 	@IsUUID()
 	id: string;
 

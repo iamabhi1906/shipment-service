@@ -3,8 +3,8 @@ import { CqrsModule } from "@nestjs/cqrs";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import Shipment from "./domain/shipment/shipment.entity.js";
 import Stop from "./domain/shipment/stop.entity.js";
-import { SHIPMENT_REPOSITORY_TOKEN } from "./domain/repositories/shipment.repository.js";
 import { ShipmentTypeOrmRepository } from "./infrastructure/persistence/typeorm/shipment-typeorm.repository.js";
+import { SHIPMENT_REPOSITORY_TOKEN } from "./domain/shipment/repositories/shipment.repository.js";
 import CreateShipmentController from "./features/create-shipment/create-shipment.controller.js";
 import CreateShipmentHandler from "./features/create-shipment/create-shipment.handler.js";
 
