@@ -1,8 +1,9 @@
-export class StopAlreadyArrivedOrDepartedException extends Error {
-	readonly statusCode = 400;
+import { DomainException } from "./domain.exception.js";
+
+export class StopAlreadyArrivedOrDepartedException extends DomainException {
+	readonly statusCode = 409;
 
 	constructor() {
-		super("Stop already arrived or departed");
-		this.name = "StopAlreadyArrivedOrDepartedException";
+		super("Stop has already arrived or departed");
 	}
 }

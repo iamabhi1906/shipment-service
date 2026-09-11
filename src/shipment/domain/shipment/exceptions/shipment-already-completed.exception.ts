@@ -1,8 +1,9 @@
-export class ShipmentAlreadyCompletedException extends Error {
+import { DomainException } from "./domain.exception.js";
+
+export class ShipmentAlreadyCompletedException extends DomainException {
 	readonly statusCode = 409;
 
 	constructor() {
-		super("Shipment already completed");
-		this.name = "ShipmentAlreadyCompletedException";
+		super("Shipment is already completed");
 	}
 }

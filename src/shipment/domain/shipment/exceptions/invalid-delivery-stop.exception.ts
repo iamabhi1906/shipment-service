@@ -1,8 +1,11 @@
-export class ShipmentMustHaveAtLeastOneStopException extends Error {
+import { DomainException } from "./domain.exception.js";
+
+export class InvalidDeliveryStopException extends DomainException {
 	readonly statusCode = 400;
 
 	constructor() {
-		super("Shipment must have at least one stop");
-		this.name = "ShipmentMustHaveAtLeastOneStopException";
+		super("Invalid delivery stop");
 	}
 }
+
+export { ShipmentMustHaveAtLeastOneStopException } from "./shipment-must-have-stop.exception.js";

@@ -1,8 +1,9 @@
-export class PreviousStopsNotDepartedException extends Error {
+import { DomainException } from "./domain.exception.js";
+
+export class PreviousStopsNotDepartedException extends DomainException {
 	readonly statusCode = 409;
 
 	constructor() {
-		super("Previous stops not departed");
-		this.name = "PreviousStopsNotDepartedException";
+		super("Previous stops have not departed");
 	}
 }

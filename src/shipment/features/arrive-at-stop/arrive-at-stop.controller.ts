@@ -9,7 +9,8 @@ export default class ArriveAtStopController {
 
 	@Post()
 	@HttpCode(HttpStatus.OK)
-	async arrive(@Param() params: ArriveAtStopValidator): Promise<void> {
+	async arrive(@Param() params: ArriveAtStopValidator): Promise<string> {
 		await this.commandBus.execute(new ArriveAtStopCommand(params.shipmentId, params.stopId));
+		return `Arrived at stop ${params.stopId}`;
 	}
 }

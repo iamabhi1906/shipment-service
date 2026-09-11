@@ -9,7 +9,8 @@ export default class DeliverAtStopController {
 
 	@Post()
 	@HttpCode(HttpStatus.OK)
-	async deliver(@Param() params: DeliverAtStopValidator): Promise<void> {
+	async deliver(@Param() params: DeliverAtStopValidator): Promise<string> {
 		await this.commandBus.execute(new DeliverAtStopCommand(params.shipmentId, params.stopId));
+		return `Delivered at stop ${params.stopId}`;
 	}
 }
