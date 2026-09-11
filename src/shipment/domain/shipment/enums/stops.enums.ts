@@ -5,8 +5,6 @@ export enum StopType {
 
 export enum StopStatus {
 	InTransit = "in-transit",
-	Completed = "completed",
-	Cancelled = "cancelled",
   Arrived = "arrived",
 	Departed = "departed",
 }

@@ -1,6 +1,10 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, type Relation } from "typeorm";
 import Shipment from "./shipment.entity.js";
 import { StopStatus, StopType } from "./enums/stops.enums.js";
+import { StopAlreadyArrivedOrDepartedException } from "./exceptions/stop-already-arrived-or-departed-exception.js";
+import { CannotPickupNonPickupStopException } from "./exceptions/cannot-pickup-non-pickup-stop.exception.js";
+import { CannotDeliverNonDeliveryStopException } from "./exceptions/cannot-deliver-non-delivery-stop.exception.js";
+import { StopNotArrivedException } from "./exceptions/stop-not-arrived.exception.js";
 
 @Entity({ schema: "shipment", name: "stops" })
 class Stop {
@@ -35,20 +39,20 @@ class Stop {
 	}
 
 	arrive() {
-		if (this.status !== StopStatus.InTransit) throw new Error("Stop has already arrived or departed");
+		if (this.status !== StopStatus.InTransit) throw new StopAlreadyArrivedOrDepartedException();
 		this.status = StopStatus.Arrived;
 	}
 
 	pickup() {
-		if (this.type !== StopType.Pickup) throw new Error("Cannot pickup a stop that is not a pickup");
-		if (this.status !== StopStatus.Arrived) throw new Error("Cannot pickup a stop that has not arrived");
+		if (this.type !== StopType.Pickup) throw new CannotPickupNonPickupStopException();
+		if (this.status !== StopStatus.Arrived) throw new StopNotArrivedException();
 		this.status = StopStatus.Departed;
 	}
 
 	deliver() {
-		if (this.type !== StopType.Delivery) throw new Error("Cannot deliver a stop that is not a delivery");
-		if (this.status !== StopStatus.Arrived) throw new Error("Cannot deliver a stop that has not arrived");
-		this.status = StopStatus.Completed;
+		if (this.type !== StopType.Delivery) throw new CannotDeliverNonDeliveryStopException();
+		if (this.status !== StopStatus.Arrived) throw new StopNotArrivedException();
+		this.status = StopStatus.Departed;
 	}
 
 	// Getters

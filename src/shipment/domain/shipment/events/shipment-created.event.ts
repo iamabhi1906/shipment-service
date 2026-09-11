@@ -1,6 +1,6 @@
 import { DomainEvent } from "./domain-event.js";
 
-class ShipmentCreatedEvent implements DomainEvent {
+export class ShipmentCreatedEvent implements DomainEvent {
 	readonly occurredAt: Date;
 
 	constructor(
