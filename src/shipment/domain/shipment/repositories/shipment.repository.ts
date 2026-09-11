@@ -1,7 +1,6 @@
 import Shipment from "../shipment.entity.js";
 
-
-export const SHIPMENT_REPOSITORY_TOKEN = "SHIPMENT_REPOSITORY_TOKEN";
+export const SHIPMENT_REPOSITORY_TOKEN = Symbol("SHIPMENT_REPOSITORY_TOKEN");
 
 export interface ShipmentRepository {
 	findById(id: string): Promise<Shipment | null>;

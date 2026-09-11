@@ -12,6 +12,8 @@ servers:
 tags:
   - name: Shipments
     description: Shipment management operations
+  - name: Stops
+    description: Shipment stop lifecycle operations
 
 paths:
   /shipments:
@@ -20,7 +22,6 @@ paths:
         - Shipments
       summary: Create a shipment
       operationId: createShipment
-
       requestBody:
         required: true
         content:
@@ -35,7 +36,6 @@ paths:
                 - id: "550e8400-e29b-41d4-a716-446655440001"
                   sequence: 2
                   type: "DELIVERY"
-
       responses:
         "201":
           description: Shipment created successfully
@@ -43,16 +43,184 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Shipment"
-
         "400":
           description: Invalid request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
-
         "409":
           description: Shipment violates a domain rule
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+
+  /shipments/{shipmentId}:
+    get:
+      tags:
+        - Shipments
+      summary: Get shipment by ID
+      operationId: getShipmentById
+      parameters:
+        - name: shipmentId
+          in: path
+          required: true
+          description: Unique identifier of the shipment
+          schema:
+            type: string
+            format: uuid
+            example: "550e8400-e29b-41d4-a716-446655440010"
+      responses:
+        "200":
+          description: Shipment retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Shipment"
+        "400":
+          description: Invalid shipment ID
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        "404":
+          description: Shipment not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+
+  /shipments/{shipmentId}/stops/{stopId}/arrive:
+    post:
+      tags:
+        - Stops
+      summary: Mark a stop as arrived
+      operationId: arriveAtStop
+      parameters:
+        - name: shipmentId
+          in: path
+          required: true
+          description: Unique identifier of the shipment
+          schema:
+            type: string
+            format: uuid
+            example: "550e8400-e29b-41d4-a716-446655440010"
+        - name: stopId
+          in: path
+          required: true
+          description: Unique identifier of the stop
+          schema:
+            type: string
+            format: uuid
+            example: "550e8400-e29b-41d4-a716-446655440000"
+      responses:
+        "200":
+          description: Stop marked as arrived successfully
+        "400":
+          description: Invalid request parameter format
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        "404":
+          description: Shipment or stop not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        "409":
+          description: Domain rule violation (e.g. previous stops not departed, stop already arrived)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+
+  /shipments/{shipmentId}/stops/{stopId}/pickup:
+    post:
+      tags:
+        - Stops
+      summary: Pick up freight at a stop
+      operationId: pickupAtStop
+      parameters:
+        - name: shipmentId
+          in: path
+          required: true
+          description: Unique identifier of the shipment
+          schema:
+            type: string
+            format: uuid
+            example: "550e8400-e29b-41d4-a716-446655440010"
+        - name: stopId
+          in: path
+          required: true
+          description: Unique identifier of the stop
+          schema:
+            type: string
+            format: uuid
+            example: "550e8400-e29b-41d4-a716-446655440000"
+      responses:
+        "200":
+          description: Stop marked as picked up (departed) successfully
+        "400":
+          description: Invalid request parameter format
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        "404":
+          description: Shipment or stop not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        "409":
+          description: Domain rule violation (e.g. stop is not a pickup stop, stop not arrived, shipment already completed)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+
+  /shipments/{shipmentId}/stops/{stopId}/deliver:
+    post:
+      tags:
+        - Stops
+      summary: Deliver freight at a stop
+      operationId: deliverAtStop
+      parameters:
+        - name: shipmentId
+          in: path
+          required: true
+          description: Unique identifier of the shipment
+          schema:
+            type: string
+            format: uuid
+            example: "550e8400-e29b-41d4-a716-446655440010"
+        - name: stopId
+          in: path
+          required: true
+          description: Unique identifier of the stop
+          schema:
+            type: string
+            format: uuid
+            example: "550e8400-e29b-41d4-a716-446655440001"
+      responses:
+        "200":
+          description: Stop marked as delivered (departed) successfully
+        "400":
+          description: Invalid request parameter format
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        "404":
+          description: Shipment or stop not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        "409":
+          description: Domain rule violation (e.g. stop is not a delivery stop, stop not arrived, shipment already completed)
           content:
             application/json:
               schema:
@@ -63,20 +231,8 @@ components:
     CreateShipmentRequest:
       type: object
       required:
-        - name
-        - description
         - stops
       properties:
-        name:
-          type: string
-          minLength: 1
-          example: "Shipment #1001"
-
-        description:
-          type: string
-          minLength: 1
-          example: "Shipment from Delhi to Chandigarh"
-
         stops:
           type: array
           minItems: 1
@@ -94,25 +250,21 @@ components:
           type: string
           format: uuid
           example: "550e8400-e29b-41d4-a716-446655440000"
-
         sequence:
           type: integer
           minimum: 1
           example: 1
-
         type:
           type: string
           enum:
-            - PICKUP
-            - DELIVERY
-          example: PICKUP
+            - pickup
+            - delivery
+          example: pickup
 
     Shipment:
       type: object
       required:
         - id
-        - name
-        - description
         - status
         - stops
       properties:
@@ -120,34 +272,16 @@ components:
           type: string
           format: uuid
           example: "550e8400-e29b-41d4-a716-446655440010"
-
-        name:
-          type: string
-          example: "Shipment #1001"
-
-        description:
-          type: string
-          example: "Shipment from Delhi to Chandigarh"
-
         status:
           type: string
           enum:
             - IN_TRANSIT
             - COMPLETED
           example: IN_TRANSIT
-
         stops:
           type: array
           items:
             $ref: "#/components/schemas/Stop"
-
-        createdAt:
-          type: string
-          format: date-time
-
-        updatedAt:
-          type: string
-          format: date-time
 
     Stop:
       type: object
@@ -161,46 +295,47 @@ components:
           type: string
           format: uuid
           example: "550e8400-e29b-41d4-a716-446655440000"
-
         sequence:
           type: integer
           example: 1
-
         type:
           type: string
           enum:
-            - PICKUP
-            - DELIVERY
-          example: PICKUP
-
+            - pickup
+            - delivery
+          example: pickup
         status:
           type: string
           enum:
-            - IN_TRANSIT
-            - ARRIVED
-            - DEPARTED
-          example: IN_TRANSIT
+            - in-transit
+            - arrived
+            - departed
+          example: in-transit
 
     ProblemDetails:
       type: object
       properties:
-        type:
-          type: string
-          format: uri
-          example: "https://api.orgatick.site/problems/validation-error"
-
-        title:
-          type: string
-          example: "Validation Error"
-
-        status:
+        statusCode:
           type: integer
           example: 400
-
-        detail:
+        timestamp:
           type: string
-          example: "The request contains invalid data."
-
-        instance:
+          format: date-time
+          example: "2026-09-11T13:25:00.000Z"
+        path:
           type: string
           example: "/shipments"
+        method:
+          type: string
+          example: "POST"
+        error:
+          type: string
+          example: "BadRequestException"
+        message:
+          oneOf:
+            - type: string
+              example: "Shipment not found"
+            - type: array
+              items:
+                type: string
+              example: ["stops.0.id must be a UUID"]

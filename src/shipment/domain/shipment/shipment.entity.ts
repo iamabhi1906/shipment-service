@@ -6,6 +6,7 @@ import { StopStatus } from "./enums/stops.enums.js";
 import { PreviousStopsNotDepartedException } from "./exceptions/previous-stops-not-departed.exception.js";
 import { ShipmentMustHaveAtLeastOneStopException } from "./exceptions/invalid-delivery-stop.exception.js";
 import { StopNotFoundException } from "./exceptions/stop-not-found.exception.js";
+import { ShipmentAlreadyCompletedException } from "./exceptions/shipment-already-completed.exception.js";
 
 @Entity({ schema: "shipment", name: "shipments" })
 class Shipment {
@@ -40,6 +41,7 @@ class Shipment {
 	}
 
 	arriveAtStop(stopId: string): void {
+		if (this.isCompleted()) throw new ShipmentAlreadyCompletedException();
 		const stop = this.findStop(stopId);
 		const previousStops = this.stops.filter((previousStop) => previousStop.getSequence() < stop.getSequence());
 		const allPreviousStopsDeparted = previousStops.every(
@@ -50,12 +52,14 @@ class Shipment {
 	}
 
 	pickupAtStop(stopId: string): void {
+		if (this.isCompleted()) throw new ShipmentAlreadyCompletedException();
 		const stop = this.findStop(stopId);
 		stop.pickup();
 		this.checkCompletion();
 	}
 
 	deliverAtStop(stopId: string): void {
+		if (this.isCompleted()) throw new ShipmentAlreadyCompletedException();
 		const stop = this.findStop(stopId);
 		stop.deliver();
 		this.checkCompletion();
@@ -70,6 +74,7 @@ class Shipment {
 	getStatus = (): ShipmentStatus => this.status;
 	getStops = (): Stop[] => this.stops;
 	getId = (): string => this.id;
+	isCompleted = (): boolean => this.status === ShipmentStatus.COMPLETED;
 }
 
 export default Shipment;

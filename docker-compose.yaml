@@ -12,18 +12,21 @@ services:
     networks:
       - shipments_network
 
-  cloudbeaver:
-    image: dbeaver/cloudbeaver:latest
-    container_name: shipment-service-cloudbeaver
-    restart: unless-stopped
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    restart: always
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@gmail.com
+      - PGADMIN_DEFAULT_PASSWORD=admin
     ports:
-      - "8979:8978"
-    volumes:
-      - cloudbeaver_workspace:/opt/cloudbeaver/workspace
-    networks:
-      - shipments_network
+      - "8889:80"
     depends_on:
       - postgres
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    networks:
+      - shipments_network
 
   shipments:
     build:
@@ -45,7 +48,7 @@ services:
 volumes:
   api_node_modules:
   shipment-service_data:
-  cloudbeaver_workspace:
+  pgadmin_data:
 
 networks:
   shipments_network:
