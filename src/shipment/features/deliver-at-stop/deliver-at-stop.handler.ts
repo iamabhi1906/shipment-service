@@ -21,9 +21,7 @@ class DeliverAtStopHandler implements ICommandHandler<DeliverAtStopCommand> {
 
 	async execute(command: DeliverAtStopCommand): Promise<void> {
 		const shipment = await this.shipmentRepository.findById(command.shipmentId);
-		if (!shipment) {
-			throw new ShipmentNotFoundException();
-		}
+		if (!shipment) throw new ShipmentNotFoundException();
 
 		shipment.deliverAtStop(command.stopId);
 
