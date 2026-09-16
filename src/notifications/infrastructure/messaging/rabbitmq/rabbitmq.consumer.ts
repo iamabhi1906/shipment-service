@@ -1,9 +1,14 @@
-import { Injectable, Logger, type OnModuleInit } from "@nestjs/common";
+import { Inject, Injectable, Logger, type OnModuleInit } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { randomUUID } from "node:crypto";
 import type { Channel, ConsumeMessage, Options } from "amqplib";
 import { RabbitMQConnection } from "../../../../common/rabbitmq/index.js";
 import { NodemailerSmtpSender } from "../../email/nodemailer-smtp-sender.js";
+import Inbox from "../../../domain/notification/inbox.entity.js";
+import {
+	INBOX_REPOSITORY_TOKEN,
+	type InboxRepository,
+} from "../../../domain/notification/repositories/inbox.repository.js";
 import { NotificationMessage } from "./rabbitmq-message.types.js";
 
 @Injectable()
@@ -15,6 +20,8 @@ export class RabbitMQConsumer implements OnModuleInit {
 		private readonly rabbitmqConnection: RabbitMQConnection,
 		private readonly configService: ConfigService,
 		private readonly smtpSender: NodemailerSmtpSender,
+		@Inject(INBOX_REPOSITORY_TOKEN)
+		private readonly inboxRepository: InboxRepository,
 	) {}
 
 	async onModuleInit(): Promise<void> {
@@ -105,7 +112,24 @@ export class RabbitMQConsumer implements OnModuleInit {
 			return;
 		}
 
+		const eventType =
+			(typeof msg.properties.headers?.["eventType"] === "string"
+				? (msg.properties.headers["eventType"] as string)
+				: undefined) ?? payload.eventType ?? "notification.event";
+
 		try {
+			const existingInbox = await this.inboxRepository.findById(messageId);
+
+			if (existingInbox && existingInbox.getAcknowledgedAt() !== null) {
+				this.logger.log(`Message '${messageId}' already acknowledged in inbox. Skipping duplicate.`);
+				channel.ack(msg);
+				return;
+			}
+
+			if (!existingInbox) {
+				await this.inboxRepository.save(Inbox.create(messageId, eventType, payload));
+			}
+
 			const result = await this.smtpSender.sendEmail({
 				to: "test@gmail.com",
 				subject: payload.subject ?? "Notification",
@@ -115,6 +139,12 @@ export class RabbitMQConsumer implements OnModuleInit {
 
 			if (!result.success) {
 				throw new Error(result.error ?? "SMTP delivery failed");
+			}
+
+			const inbox = await this.inboxRepository.findById(messageId);
+			if (inbox && inbox.getAcknowledgedAt() === null) {
+				inbox.acknowledge(new Date());
+				await this.inboxRepository.save(inbox);
 			}
 
 			channel.ack(msg);

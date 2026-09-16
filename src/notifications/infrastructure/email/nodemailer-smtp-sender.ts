@@ -5,7 +5,7 @@ import type {
 	EmailSender,
 	SendEmailOptions,
 	SendEmailResult,
-} from "../../domain/notification/ports/email-sender.interface.js";
+} from "../../domain/notification/interface/email-sender.interface.js";
 
 @Injectable()
 export class NodemailerSmtpSender implements EmailSender, OnModuleInit {

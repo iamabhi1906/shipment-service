@@ -23,7 +23,6 @@ export class ProcessInboxEventHandler implements ICommandHandler<ProcessInboxEve
 
 		// idempotency check: find if message was already handled in inbox
 		try {
-			// idempotency check: find if message was already handled in inbox
 			const existingInbox = await queryRunner.manager.findOne(Inbox, {
 				where: { id: messageId },
 			});
@@ -34,7 +33,7 @@ export class ProcessInboxEventHandler implements ICommandHandler<ProcessInboxEve
 				return { processed: false, reason: "duplicate" };
 			}
 
-			// record message in Inbox
+			// record message in Inbox (kept permanently, not removed after processing)
 			const inbox = Inbox.create(messageId, eventType, payload);
 			await queryRunner.manager.save(inbox);
 
@@ -64,10 +63,34 @@ export class ProcessInboxEventHandler implements ICommandHandler<ProcessInboxEve
 					),
 				);
 			}
+
+			// mark message as acknowledged in inbox once processed successfully
+			await this.acknowledge(messageId);
 			return { processed: true };
 		} catch (error: any) {
 			this.logger.error(`Failed to trigger notification for event '${eventType}': ${error.message}`, error.stack);
 			return { processed: false, reason: error.message };
+		}
+	}
+
+	private async acknowledge(messageId: string): Promise<void> {
+		const queryRunner = this.dataSource.createQueryRunner();
+		await queryRunner.connect();
+		try {
+			await queryRunner.startTransaction();
+			const inbox = await queryRunner.manager.findOne(Inbox, {
+				where: { id: messageId },
+			});
+			if (inbox && inbox.getAcknowledgedAt() === null) {
+				inbox.acknowledge(new Date());
+				await queryRunner.manager.save(inbox);
+			}
+			await queryRunner.commitTransaction();
+		} catch (err: any) {
+			await queryRunner.rollbackTransaction();
+			this.logger.error(`Error acknowledging inbox record for message '${messageId}': ${err.message}`, err.stack);
+		} finally {
+			await queryRunner.release();
 		}
 	}
 

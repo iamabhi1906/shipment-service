@@ -1,12 +1,12 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn, type Relation } from "typeorm";
 import Stop from "./stop.entity.js";
-import { uuid } from "uuidv4";
 import { ShipmentStatus } from "./enums/shipment.enums.js";
 import { StopStatus } from "./enums/stops.enums.js";
 import { PreviousStopsNotDepartedException } from "./exceptions/previous-stops-not-departed.exception.js";
 import { ShipmentMustHaveAtLeastOneStopException } from "./exceptions/invalid-delivery-stop.exception.js";
 import { StopNotFoundException } from "./exceptions/stop-not-found.exception.js";
 import { ShipmentAlreadyCompletedException } from "./exceptions/shipment-already-completed.exception.js";
+import { randomUUID } from "node:crypto";
 
 @Entity({ schema: "shipment", name: "shipments" })
 class Shipment {
@@ -35,7 +35,7 @@ class Shipment {
 
 	static create(stops: Stop[]): Shipment {
 		if (stops.length === 0) throw new ShipmentMustHaveAtLeastOneStopException();
-		const shipment = new Shipment(uuid());
+		const shipment = new Shipment(randomUUID());
 		shipment.stops = stops;
 		return shipment;
 	}

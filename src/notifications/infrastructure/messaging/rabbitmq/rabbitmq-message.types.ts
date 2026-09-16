@@ -3,6 +3,7 @@ export type NotificationMessage = {
 	recipient?: string;
 	recipientEmail?: string;
 	email?: string;
+	eventType?: string;
 	subject?: string;
 	html?: string;
 	body?: string;

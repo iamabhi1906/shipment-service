@@ -10,6 +10,7 @@ import { CreateStopsTable1789036692109 } from "./shipment/infrastructure/databas
 import { CreateNotificationServiceInbox1789539246827 } from "./notifications/infrastructure/database/migrations/1789539246827-CreateNotificationServiceInbox.js";
 import { CreateNotificationTable1789539150284 } from "./notifications/infrastructure/database/migrations/1789539150284-CreateNotificationTable.js";
 import { CreateShipmentServiceOutbox1789540249014 } from "./shipment/infrastructure/database/migrations/1789540249014-CreateShipmentServiceOutbox.js";
+import { AddAcknowledgedAtToNotificationInbox1789559309919 } from "./notifications/infrastructure/database/migrations/1789559309919-AddAcknowledgedAtToNotificationInbox.js";
 
 dotenv.config();
 
@@ -28,6 +29,7 @@ export const dataSourceOptions: DataSourceOptions = {
 		CreateNotificationTable1789539150284,
 		CreateNotificationServiceInbox1789539246827,
 		CreateShipmentServiceOutbox1789540249014,
+		AddAcknowledgedAtToNotificationInbox1789559309919,
 	],
 	migrationsTableName: "migrations",
 };

@@ -14,6 +14,9 @@ export class Inbox {
 	@CreateDateColumn({ type: "timestamp with time zone", name: "received_at" })
 	receivedAt: Date;
 
+	@Column({ type: "timestamp with time zone", name: "acknowledged_at", nullable: true })
+	acknowledgedAt: Date | null;
+
 	constructor(id?: string) {
 		if (id) {
 			this.id = id;
@@ -32,6 +35,11 @@ export class Inbox {
 	getEventType = (): string => this.eventType;
 	getPayload = (): Record<string, any> => this.payload;
 	getReceivedAt = (): Date => this.receivedAt;
+	getAcknowledgedAt = (): Date | null => this.acknowledgedAt;
+
+	acknowledge(at: Date): void {
+		this.acknowledgedAt = at;
+	}
 }
 
 export default Inbox;
