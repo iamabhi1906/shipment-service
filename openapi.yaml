@@ -1,19 +1,21 @@
 openapi: 3.0.3
 
 info:
-  title: Shipment Management API
-  description: HTTP API for managing shipments and their stops.
+  title: Shipment & Notification Microservices API
+  description: HTTP API for managing shipments, stops, and notification delivery via SMTP and RabbitMQ.
   version: 1.0.0
 
 servers:
   - url: http://localhost:5050
-    description: Shipment service
+    description: Microservice API
 
 tags:
   - name: Shipments
     description: Shipment management operations
   - name: Stops
     description: Shipment stop lifecycle operations
+  - name: Notifications
+    description: Notification management and email delivery operations
 
 paths:
   /shipments:
@@ -226,8 +228,177 @@ paths:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
 
+  /notifications:
+    post:
+      tags:
+        - Notifications
+      summary: Send an email/channel notification
+      operationId: sendNotification
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SendNotificationRequest"
+            example:
+              recipient: "customer@example.com"
+              subject: "Order update"
+              body: "<p>Your shipment has arrived at hub.</p>"
+              type: "SHIPMENT_CREATED"
+              channel: "EMAIL"
+      responses:
+        "201":
+          description: Notification created and dispatched
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Notification"
+        "400":
+          description: Invalid notification request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+
+    get:
+      tags:
+        - Notifications
+      summary: List all notifications or filter by recipient
+      operationId: getNotifications
+      parameters:
+        - name: recipient
+          in: query
+          required: false
+          description: Filter notifications by recipient email
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of notifications
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Notification"
+
+  /notifications/{id}:
+    get:
+      tags:
+        - Notifications
+      summary: Get notification by ID
+      operationId: getNotificationById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Unique identifier of notification
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Notification details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Notification"
+        "404":
+          description: Notification not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+
 components:
   schemas:
+    SendNotificationRequest:
+      type: object
+      required:
+        - recipient
+        - subject
+        - body
+      properties:
+        recipient:
+          type: string
+          format: email
+          example: "customer@example.com"
+        subject:
+          type: string
+          example: "Shipment #123 Update"
+        body:
+          type: string
+          example: "<p>Your shipment has departed.</p>"
+        type:
+          type: string
+          enum:
+            - SHIPMENT_CREATED
+            - STOP_ARRIVED
+            - STOP_DELIVERED
+            - ORDER_CREATED
+            - CUSTOM
+            - ALERT
+          default: CUSTOM
+        channel:
+          type: string
+          enum:
+            - EMAIL
+            - SMS
+            - PUSH
+            - IN_APP
+          default: EMAIL
+        metadata:
+          type: object
+          additionalProperties: true
+
+    Notification:
+      type: object
+      required:
+        - id
+        - recipient
+        - subject
+        - body
+        - type
+        - channel
+        - status
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        recipient:
+          type: string
+        subject:
+          type: string
+        body:
+          type: string
+        type:
+          type: string
+          enum: [SHIPMENT_CREATED, STOP_ARRIVED, STOP_DELIVERED, ORDER_CREATED, CUSTOM, ALERT]
+        channel:
+          type: string
+          enum: [EMAIL, SMS, PUSH, IN_APP]
+        status:
+          type: string
+          enum: [PENDING, SENT, FAILED]
+        errorMessage:
+          type: string
+          nullable: true
+        metadata:
+          type: object
+          nullable: true
+        sentAt:
+          type: string
+          format: date-time
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
     CreateShipmentRequest:
       type: object
       required:

@@ -1,7 +1,7 @@
 FROM node:24-bookworm-slim AS base
 WORKDIR /app
 RUN corepack enable
-COPY package.json pnpm-lock.yaml ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 
 # Development
 FROM base AS dev

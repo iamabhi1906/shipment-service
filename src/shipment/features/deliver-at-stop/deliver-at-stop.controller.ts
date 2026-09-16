@@ -1,4 +1,4 @@
-import { Controller, HttpCode, HttpStatus, Param, Post } from "@nestjs/common";
+import { Controller, HttpCode, HttpStatus, Param, Patch } from "@nestjs/common";
 import { CommandBus } from "@nestjs/cqrs";
 import { DeliverAtStopValidator } from "./deliver-at-stop.validator.js";
 import DeliverAtStopCommand from "./deliver-at-stop.command.js";
@@ -7,7 +7,7 @@ import DeliverAtStopCommand from "./deliver-at-stop.command.js";
 export default class DeliverAtStopController {
 	constructor(private readonly commandBus: CommandBus) {}
 
-	@Post()
+	@Patch()
 	@HttpCode(HttpStatus.OK)
 	async deliver(@Param() params: DeliverAtStopValidator): Promise<string> {
 		await this.commandBus.execute(new DeliverAtStopCommand(params.shipmentId, params.stopId));

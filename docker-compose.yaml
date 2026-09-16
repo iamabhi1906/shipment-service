@@ -28,11 +28,38 @@ services:
     networks:
       - shipments_network
 
+  rabbitmq:
+    image: rabbitmq:4-management
+    container_name: rabbitmq
+    restart: unless-stopped
+    ports:
+      - "5672:5672" # AMQP default port
+      - "15672:15672" # Management UI
+    environment:
+      RABBITMQ_DEFAULT_USER: user
+      RABBITMQ_DEFAULT_PASS: root
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - shipments_network
+
+  mailhog:
+    image: mailhog/mailhog
+    container_name: mailhog
+    ports:
+      - "8025:8025"
+    networks:
+      - shipments_network
+
   shipments:
     build:
       context: .
       target: dev
     container_name: shipments
+    depends_on:
+      - rabbitmq
+      - postgres
+      - mailhog
     init: true
     ports:
       - "5050:3000"
@@ -49,6 +76,7 @@ volumes:
   api_node_modules:
   shipment-service_data:
   pgadmin_data:
+  rabbitmq_data:
 
 networks:
   shipments_network:

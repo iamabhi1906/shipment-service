@@ -1,4 +1,4 @@
-import { Controller, HttpCode, HttpStatus, Param, Post } from "@nestjs/common";
+import { Controller, HttpCode, HttpStatus, Param, Patch } from "@nestjs/common";
 import { CommandBus } from "@nestjs/cqrs";
 import { PickupAtStopValidator } from "./pickup-at-stop.validator.js";
 import PickupAtStopCommand from "./pickup-at-stop.command.js";
@@ -7,7 +7,7 @@ import PickupAtStopCommand from "./pickup-at-stop.command.js";
 export default class PickupAtStopController {
 	constructor(private readonly commandBus: CommandBus) {}
 
-	@Post()
+	@Patch()
 	@HttpCode(HttpStatus.OK)
 	async pickup(@Param() params: PickupAtStopValidator): Promise<string> {
 		await this.commandBus.execute(new PickupAtStopCommand(params.shipmentId, params.stopId));

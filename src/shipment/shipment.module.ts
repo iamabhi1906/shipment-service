@@ -17,6 +17,7 @@ import DeliverAtStopController from "./features/deliver-at-stop/deliver-at-stop.
 import DeliverAtStopHandler from "./features/deliver-at-stop/deliver-at-stop.handler.js";
 import GetShipmentController from "./features/get-shipment/get-shipment.controller.js";
 import GetShipmentHandler from "./features/get-shipment/get-shipment.handler.js";
+import ShipmentRabbitMQEventPublisher from "./infrastructure/messaging/rabbitmq-event-publisher.js";
 
 @Module({
 	imports: [CqrsModule, TypeOrmModule.forFeature([Shipment, Stop])],
@@ -34,7 +35,7 @@ import GetShipmentHandler from "./features/get-shipment/get-shipment.handler.js"
 		},
 		{
 			provide: EVENT_PUBLISHER_TOKEN,
-			useClass: InMemoryEventPublisher,
+			useClass: ShipmentRabbitMQEventPublisher,
 		},
 		ShipmentTypeOrmRepository,
 		InMemoryEventPublisher,

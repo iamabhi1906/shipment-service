@@ -20,6 +20,9 @@
 				"useImportType": "off",
 				"noNonNullAssertion": "off"
 			},
+			"suspicious": {
+				"noExplicitAny": "off"
+			},
 			"preset": "recommended"
 		}
 	},
