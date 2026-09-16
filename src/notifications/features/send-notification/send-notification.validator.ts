@@ -1,5 +1,4 @@
-import { IsEmail, IsEnum, IsObject, IsOptional, IsString, MinLength } from "class-validator";
-import { NotificationChannel, NotificationType } from "../../domain/notification/enums/notification.enums.js";
+import { IsEmail, IsObject, IsOptional, IsString, MinLength } from "class-validator";
 
 export class SendNotificationValidator {
 	@IsEmail()
@@ -12,14 +11,6 @@ export class SendNotificationValidator {
 	@IsString()
 	@MinLength(1)
 	body: string;
-
-	@IsOptional()
-	@IsEnum(NotificationType)
-	type?: NotificationType;
-
-	@IsOptional()
-	@IsEnum(NotificationChannel)
-	channel?: NotificationChannel;
 
 	@IsOptional()
 	@IsObject()

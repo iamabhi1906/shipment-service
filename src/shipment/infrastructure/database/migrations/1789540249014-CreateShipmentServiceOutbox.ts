@@ -1,5 +1,4 @@
-import { MigrationInterface, QueryRunner } from "typeorm";
-import { Table } from "typeorm/browser";
+import { MigrationInterface, QueryRunner, Table } from "typeorm";
 
 export class CreateShipmentServiceOutbox1789540249014 implements MigrationInterface {
 	public async up(queryRunner: QueryRunner): Promise<void> {

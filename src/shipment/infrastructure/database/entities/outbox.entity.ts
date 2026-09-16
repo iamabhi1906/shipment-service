@@ -16,7 +16,7 @@ export class Outbox {
 	@Column({ type: "jsonb", nullable: false })
 	payload!: object;
 
-	@Column({ type: "enum", enum: OutboxStatus, default: OutboxStatus.PENDING })
+	@Column({ name: "acknowledged", type: "enum", enum: OutboxStatus, default: OutboxStatus.PENDING })
 	status!: OutboxStatus;
 
 	@CreateDateColumn()

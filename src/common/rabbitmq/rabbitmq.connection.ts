@@ -2,7 +2,6 @@ import { Injectable, Logger, type OnModuleDestroy, type OnModuleInit } from "@ne
 import { ConfigService } from "@nestjs/config";
 import amqplib, { type ChannelModel, type Channel, type Options } from "amqplib";
 import { randomUUID } from "node:crypto";
-import { RABBITMQ_CONSTANTS } from "./rabbitmq.constants.js";
 
 export interface PublishMessageOptions {
 	routingKey: string;
@@ -30,11 +29,7 @@ export class RabbitMQConnection implements OnModuleInit, OnModuleDestroy {
 	}
 
 	get exchangeName(): string {
-		return (
-			this.configService.get<string>("RABBITMQ_TOPIC_EXCHANGE") ||
-			this.configService.get<string>("RABBITMQ_EXCHANGE") ||
-			RABBITMQ_CONSTANTS.TOPIC_EXCHANGE
-		);
+		return this.configService.get<string>("RABBITMQ_TOPIC_EXCHANGE")!;
 	}
 
 	async connect(): Promise<void> {
@@ -62,7 +57,7 @@ export class RabbitMQConnection implements OnModuleInit, OnModuleDestroy {
 				this.channel = null;
 				setTimeout(() => this.connect(), 5000);
 			});
-			await this.channel.assertExchange(this.exchangeName, RABBITMQ_CONSTANTS.EXCHANGE_TYPE, {
+			await this.channel.assertExchange(this.exchangeName, "topic", {
 				durable: true,
 			});
 			this.logger.log(`RabbitMQ connected and topic exchange '${this.exchangeName}' asserted.`);

@@ -1,4 +1,4 @@
-import { Injectable, Logger } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { randomUUID } from "node:crypto";
 import type { DomainEvent } from "../../../domain/notification/events/domain-event.js";
 import type { NotificationEventPublisher } from "../../../domain/notification/events/event-publisher.interface.js";
@@ -6,8 +6,6 @@ import { RabbitMQConnection } from "../../../../common/rabbitmq/index.js";
 
 @Injectable()
 export class RabbitMQEventPublisher implements NotificationEventPublisher {
-	private readonly logger = new Logger(RabbitMQEventPublisher.name);
-
 	constructor(private readonly rabbitmqConnection: RabbitMQConnection) {}
 
 	async publish<T extends DomainEvent>(event: T, routingKey?: string): Promise<void> {

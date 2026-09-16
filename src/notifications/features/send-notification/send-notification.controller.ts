@@ -10,7 +10,7 @@ export class SendNotificationController {
 	@Post()
 	async sendNotification(@Body() body: SendNotificationValidator) {
 		return await this.commandBus.execute(
-			new SendNotificationCommand(body.recipient, body.subject, body.body, body.type, body.channel, body.metadata),
+			new SendNotificationCommand(body.recipient, body.subject, body.body, body.metadata),
 		);
 	}
 }
